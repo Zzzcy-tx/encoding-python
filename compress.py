@@ -62,12 +62,10 @@ def build_huffman_tree(char_freqs):
         # 弹出频率最小的两个节点
         left = heapq.heappop(priority_queue)
         right = heapq.heappop(priority_queue)
-
         # 创建一个新节点，它的频率是两个子节点频率的和
         merged = HuffmanNode(None, left.freq + right.freq)
         merged.left = left
         merged.right = right
-
         # 将新节点放回堆中
         heapq.heappush(priority_queue, merged)
 
@@ -99,11 +97,9 @@ def generate_huffman_codes(node, current_code="", code_dict=None):
     """
     if code_dict is None:
         code_dict = {}
-
     # 如果是叶子节点，保存该字符的编码
     if node.char is not None:
         code_dict[node.char] = current_code
-
     # 如果不是叶子节点，继续递归遍历
     if node.left is not None:
         generate_huffman_codes(node.left, current_code + "0", code_dict)
@@ -112,45 +108,35 @@ def generate_huffman_codes(node, current_code="", code_dict=None):
 
     return code_dict
 
-import pickle
 
 def encode_file(input_file_path, output_file_path, huffman_codes):
-    # 将霍夫曼编码表转换为JSON字符串
-    codes_json = json.dumps(huffman_codes)
-
-    # 以二进制模式读取输入文件，避免换行符转换问题
+    
+    codes_json = json.dumps(huffman_codes)          # 将霍夫曼编码表转换为JSON字符串
+    
     with open(input_file_path, 'rb') as file:
         input_data = file.read()
     
-    # 将输入数据解码为文本进行处理
     input_text = input_data.decode('utf-8')
 
-    encoded_text = ''
+    encoded_text = ''                               # 存储编码后的文本
     for char in input_text:
-        encoded_text += huffman_codes.get(char, '')  # 根据霍夫曼编码表编码
+        encoded_text += huffman_codes.get(char, '') # 根据霍夫曼编码表编码
 
-    # 计算编码后的总比特数
     encoded_bits_length = len(encoded_text)
     print("编码后的总比特数:", encoded_bits_length)
 
     with open(output_file_path, 'wb') as output_file:
-        # 写入编码表长度
-        output_file.write(len(codes_json).to_bytes(4, byteorder='big'))
-        # 写入有效编码比特长度
-        output_file.write(encoded_bits_length.to_bytes(4, byteorder='big'))
-        # 写入编码表
-        output_file.write(codes_json.encode("utf-8"))
+        output_file.write(len(codes_json).to_bytes(4, byteorder='big'))     # 写入编码表长度
+        output_file.write(encoded_bits_length.to_bytes(4, byteorder='big')) # 写入有效编码长度
+        output_file.write(codes_json.encode("utf-8"))                       # 写入编码表
         
-        # 将编码数据转换为字节并写入
         byte_array = bytearray()
         for i in range(0, len(encoded_text), 8):
             byte = encoded_text[i:i+8]
             if len(byte) < 8:
                 byte = byte.ljust(8, '0')
             byte_array.append(int(byte, 2))
-        output_file.write(byte_array)
-
-
+        output_file.write(byte_array)                                       # 写入有效编码数据
 
 
 
@@ -161,15 +147,15 @@ def compress(input_file_path: str, output_file_path: str) -> None:
     character_fre_dict = count_character_frequencies(input_file_path)   # 统计字符频率
     print(count_character_frequencies(input_file_path))                 # 打印字符频率
     
-    root = build_huffman_tree(character_fre_dict)           # 构建霍夫曼树
-    print_huffman_tree(root)                                # 打印霍夫曼树
+    root = build_huffman_tree(character_fre_dict)                       # 构建霍夫曼树
+    print_huffman_tree(root)                                            # 打印霍夫曼树
     
-    huffman_codes = generate_huffman_codes(root)           # 生成霍夫曼编码
+    huffman_codes = generate_huffman_codes(root)                        # 生成霍夫曼编码
     print("Huffman Codes:")
-    for char, code in huffman_codes.items():               # 打印霍夫曼编码
+    for char, code in huffman_codes.items():                            # 打印霍夫曼编码
         print(f"'{char}': {code}")
     
-    encode_file(input_file_path, output_file_path, huffman_codes)
+    encode_file(input_file_path, output_file_path, huffman_codes)       # 编码并创建文件
     
     # with open(input_file_path, 'r') as f:
     #     input_file_data = f.read()

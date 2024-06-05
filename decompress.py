@@ -23,17 +23,16 @@ def decode_file(input_file_path, output_file_path):
     with open(input_file_path, 'rb') as file:
         codes_length = int.from_bytes(file.read(4), byteorder='big')    # 读取编码表长度
         encoded_length = int.from_bytes(file.read(4), byteorder='big')  # 读取有效编码长度
-        print(codes_length, encoded_length)
-        codes_json = file.read(codes_length)        # 读取编码表内容
-        encoded_data = file.read(encoded_length)    # 读取有效编码数据
+        # print(codes_length, encoded_length)
+        codes_json = file.read(codes_length)                            # 读取编码表
+        encoded_data = file.read(encoded_length)                        # 读取有效编码数据
         
-        huffman_codes = json.loads(codes_json.decode('utf-8'))
-        print(codes_json)
-        # 反转霍夫曼编码表以便解码
-        decode_map = {code: char for char, code in huffman_codes.items()}
-        # 读取剩余的编码数据
-        bit_string = ''.join(f'{byte:08b}' for byte in encoded_data)
-        # 解码过程
+        bit_string = ''.join(f'{byte:08b}' for byte in encoded_data)    # 将编码数据转换为二进制字符串
+
+        huffman_codes = json.loads(codes_json.decode('utf-8'))          # 将编码表转换为字典
+        # print(codes_json)
+        decode_map = {code: char for char, code in huffman_codes.items()}# 反转霍夫曼编码表
+
     current_code = ""
     decoded_text = ""
     sum = 0
