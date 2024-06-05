@@ -23,7 +23,7 @@ def decode_file(input_file_path, output_file_path):
     with open(input_file_path, 'rb') as file:
         codes_length = int.from_bytes(file.read(4), byteorder='big')    # 读取编码表长度
         encoded_length = int.from_bytes(file.read(4), byteorder='big')  # 读取有效编码长度
-        # print(codes_length, encoded_length)
+        print(codes_length, encoded_length)
         codes_json = file.read(codes_length)        # 读取编码表内容
         encoded_data = file.read(encoded_length)    # 读取有效编码数据
         
@@ -41,13 +41,12 @@ def decode_file(input_file_path, output_file_path):
         current_code += bit
         if sum < encoded_length:
             if current_code in decode_map:
-                sum = sum + 1
                 decoded_text += decode_map[current_code]
                 current_code = ""  # 重置当前编码字符串
+        sum = sum + 1
     
-
-    with open(output_file_path, 'w', encoding='utf-8') as file:
-        file.write(decoded_text)
+    with open(output_file_path, 'wb') as file:
+        file.write(decoded_text.encode('utf-8'))
 
 
 def decompress(input_file_path: str, output_file_path: str) -> None:

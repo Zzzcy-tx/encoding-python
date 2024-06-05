@@ -117,23 +117,29 @@ import pickle
 def encode_file(input_file_path, output_file_path, huffman_codes):
     # 将霍夫曼编码表转换为JSON字符串
     codes_json = json.dumps(huffman_codes)
-    print('xx',codes_json)
 
-    with open(input_file_path, 'r', encoding='utf-8') as file:
-        input_text = file.read()  # 读取输入文件的全部内容
-        
-    encoded_length = len(input_text)
+    # 以二进制模式读取输入文件，避免换行符转换问题
+    with open(input_file_path, 'rb') as file:
+        input_data = file.read()
+    
+    # 将输入数据解码为文本进行处理
+    input_text = input_data.decode('utf-8')
 
     encoded_text = ''
     for char in input_text:
         encoded_text += huffman_codes.get(char, '')  # 根据霍夫曼编码表编码
 
+    # 计算编码后的总比特数
+    encoded_bits_length = len(encoded_text)
+    print("编码后的总比特数:", encoded_bits_length)
+
     with open(output_file_path, 'wb') as output_file:
-        output_file.write(len(codes_json).to_bytes(4, byteorder='big'))  # 写入编码表长度
-        output_file.write(encoded_length.to_bytes(4, byteorder='big'))   # 写入有效编码长度
-        print(len(codes_json),encoded_length)
-        
-        output_file.write(codes_json.encode("utf-8"))  # 写入编码表
+        # 写入编码表长度
+        output_file.write(len(codes_json).to_bytes(4, byteorder='big'))
+        # 写入有效编码比特长度
+        output_file.write(encoded_bits_length.to_bytes(4, byteorder='big'))
+        # 写入编码表
+        output_file.write(codes_json.encode("utf-8"))
         
         # 将编码数据转换为字节并写入
         byte_array = bytearray()
@@ -143,6 +149,7 @@ def encode_file(input_file_path, output_file_path, huffman_codes):
                 byte = byte.ljust(8, '0')
             byte_array.append(int(byte, 2))
         output_file.write(byte_array)
+
 
 
 
