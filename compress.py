@@ -109,6 +109,14 @@ def generate_huffman_codes(node, current_code="", code_dict=None):
     return code_dict
 
 
+def compute_expected_code_length(huffman_codes, char_freqs):
+    total_chars = sum(char_freqs.values())
+    expected_length = 0
+    for char, code in huffman_codes.items():
+        p = char_freqs[char] / total_chars
+        expected_length += p * len(code)
+    return expected_length
+
 def encode_file(input_file_path, output_file_path, huffman_codes):
     
     codes_json = json.dumps(huffman_codes)          # 将霍夫曼编码表转换为JSON字符串
@@ -154,6 +162,9 @@ def compress(input_file_path: str, output_file_path: str) -> None:
     print("Huffman Codes:")
     for char, code in huffman_codes.items():                            # 打印霍夫曼编码
         print(f"'{char}': {code}")
+        
+    expected_length = compute_expected_code_length(huffman_codes, character_fre_dict)   # 计算期望编码长度
+    print(f"Expected Huffman Code Length: {expected_length:.2f} bits per symbol")       # 打印期望编码长度
     
     encode_file(input_file_path, output_file_path, huffman_codes)       # 编码并创建文件
     
