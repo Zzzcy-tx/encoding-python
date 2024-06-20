@@ -6,14 +6,12 @@ def compute_transition_matrix(input_text: str) -> dict:
     transition_counts = defaultdict(lambda: defaultdict(int))
     total_counts = defaultdict(int)
     
-    # 统计转移频率
     for i in range(len(input_text) - 1):
         current_char = input_text[i]
         next_char = input_text[i + 1]
         transition_counts[current_char][next_char] += 1
         total_counts[current_char] += 1
     
-    # 计算转移概率矩阵
     transition_matrix = {}
     for current_char, next_chars in transition_counts.items():
         transition_matrix[current_char] = {}
@@ -48,15 +46,8 @@ def compute_performance_limit(input_file_path: str) -> float:
 
 def main(input_file_path):
     conditional_entropy = compute_performance_limit(input_file_path)
-    
-    with open(input_file_path, 'r', encoding='utf-8') as file:
-        text = file.read()
-    
-    total_bits = conditional_entropy * len(text)
 
-    # 输出结果
     print(f"22.张成亦 performance limit: {conditional_entropy:.4f} bits per symbol")
-    print(f"22.张成亦 theoretical compression limit: {total_bits/8:.2f} Bytes")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some files.')
